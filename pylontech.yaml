@@ -1,0 +1,44 @@
+esphome:
+  name: pylontech_reader
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+external_components:
+  - source: "./external_components"
+
+# ---------------- UART to the MAX485 ----------------
+uart:
+  id: uart_bus
+  tx_pin: GPIO17
+  rx_pin: GPIO16
+  baud_rate: 9600
+  parity: EVEN
+  stop_bits: 1
+
+# ---------------- logging ---------------------------
+logger:
+  level: DEBUG
+  baud_rate: 0
+
+# ---------------- poll the battery ------------------
+interval:
+  - interval: 30s
+    then:
+      - delay: 5ms
+      - uart.write: !lambda |-
+          return std::vector<uint8_t>{
+            0x7E,                   // SOI
+            '2','0','0','2',        // VER + ADR (address 0x02)
+            '4','6','4','2',        // CID1='F', CID2='B'
+            '0','2','0','2',        // LENID='02', INFO='02'
+            '4','6','3','8',        // CHKSUM='FC8E'
+            0x0D                    // EOI (CR)
+          };
+
+sensor:
+  - platform: pylontech_sensor
+    uart_id: uart_bus
+    name: "Pylontech Module Voltage"
