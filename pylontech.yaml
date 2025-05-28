@@ -1,10 +1,24 @@
 esphome:
-  name: pylontech_reader
+  name: pylontech
 
 esp32:
   board: esp32dev
   framework:
     type: arduino
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  ap:
+    ssid: "Pylontech"
+
+captive_portal:
+
+ota:
+  platform: esphome
+
+api:
 
 external_components:
   - source: "./external_components"
@@ -21,7 +35,7 @@ uart:
 # ---------------- logging ---------------------------
 logger:
   level: DEBUG
-  baud_rate: 0
+  baud_rate: 115000
 
 # ---------------- poll the battery ------------------
 interval:
